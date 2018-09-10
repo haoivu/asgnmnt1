@@ -1,21 +1,5 @@
 import random
-
-class Environment:
-    def __init__(self, c_1, c_2):
-        self.c_1 = c_1
-        self.c_2 = c_2
-
-    def penalty(self, action):
-        if action == 1:
-            if random.random() <= self.c_1:
-                return True
-            else:
-                return False
-        elif action == 2:
-            if random.random() <= self.c_2:
-                return True
-            else:
-                return False
+from collections import Counter
 
 class Tsetlin:
     def __init__(self, n):
@@ -37,42 +21,53 @@ class Tsetlin:
         elif self.state > self.n:
             self.state -= 1
 
-    def makeDecision(self):
+    def make_decision(self):
         if self.state <= self.n:
             return 1
         else:
             return 2
 
-yes = 0
-reward_prob = yes * 0.2
-reward_prob_1 = 0.6 - (yes - 3) * 0.2
-env = Environment(reward_prob, reward_prob_1)
-learning_automata = Tsetlin(5)
+action_count = [0, 0]
+# states = [1,2,3,5,10,50]
+states = 50
+runs = 50
+automaton = 5
+yaas = []
+las = []
+for i in range(automaton):
+    las.append(Tsetlin(states))
 
-def goore_game():
-    for i in range(5):
-        yes_no_count = [0, 0]
-        action_count = [0, 0]
-        count = 0
-        states = 10
-        la = []
-        la.append(Tsetlin(states))
+def learning_automaton():
+    for n in range(runs):
+        yay_nay = [0, 0]
+        for la in las:
+            action = la.make_decision()
+            yay_nay[action - 1] += 1
+            action_count[action - 1] += 1
 
-        for n in range(10):
-            count += 1
-            for m in la:
-                action = m.makeDecision()
-                action_count[action - 1] += 1
-                yes_no_count[action - 1] += 1
+        yes = yay_nay[0]
+        yaas.append(yes)
+        counts = Counter(yaas)
+        print '#{} - {}'.format(n+1,yay_nay)
+        if yes < 4:
+            reward_probability = yes * 0.2
+        else:
+            reward_probability = 0.6 - (yes - 3) * 0.2
 
-            yes = yes_no_count[0]
-
-            if yes < 4:
-                reward_prob = yes * 0.2
+        reward_count = 0
+        for m, la in enumerate(las):
+            if random.random() <= reward_probability:
+                reward_count += 1
+                la.reward()
             else:
-                reward_prob = 0.6 - (yes - 3) * 0.2
-
-            print "#{} - {}".format(n, action_count)
-        print "#Yes: {}".format(yes)
-
-goore_game()
+                la.penalize()
+    print '#0:', counts[0]
+    print '#1:', counts[1]
+    print '#2:', counts[2]
+    print '#3:', counts[3]
+    print '#4:', counts[4]
+    print '#5:', counts[5]
+    print '#Yes: {} - #No: {}'.format(action_count[0], action_count[1])
+    result = float(action_count[1]) / float(action_count[0])
+    print result
+learning_automaton()
