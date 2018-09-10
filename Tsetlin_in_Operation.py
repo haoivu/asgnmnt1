@@ -1,8 +1,4 @@
-
 import random
-#import matplotlib.pyplot
-#import pandas
-
 
 class Environment:
     def __init__(self, c_1, c_2):
@@ -21,7 +17,6 @@ class Environment:
             else:
                 return False
 
-
 class Tsetlin:
     def __init__(self, n):
         # n is the number of states per action
@@ -31,9 +26,9 @@ class Tsetlin:
         self.state = random.choice([self.n, self.n+1])
 
     def reward(self):
-        if self.n >= self.state > 1:
+        if self.state <= self.n and self.state > 1:
             self.state -= 1
-        elif self.n < self.state < 2*self.n:
+        elif self.state > self.n and self.state < 2*self.n:
             self.state += 1
 
     def penalize(self):
@@ -49,53 +44,27 @@ class Tsetlin:
             return 2
 
 
-env = Environment(0.1, 0.3)
-action_count = [0, 0]
-progression = []
+env = Environment(0.1,0.3)
 
-states = 10
-las = [Tsetlin(states), Tsetlin(states), Tsetlin(states), Tsetlin(states), Tsetlin(states)]
+la = Tsetlin(3)
 
-for i in range(100):
-    print('Run #{}'.format(i))
-    yes_no_count = [0, 0]
-    for la in las:
-        action = la.makeDecision()
+action_count = [0,0]
 
-        yes_no_count[action - 1] += 1
-        action_count[action - 1] += 1
-        progression.append(action_count[0])
+for i in range(500):
+    action = la.makeDecision()
 
-    yes = yes_no_count[0]
+    action_count[action - 1] += 1
+    penalty = env.penalty(action)
 
-    #print('{} yes\'s and {} no\'s'.format(yes, yes_no_count[1]))
+    print "State:", la.state,"Action:", action,
 
-    if yes < 4:
-        reward_probability = yes * 0.2
+    if penalty:
+        print "Penalty",
+        la.penalize()
     else:
-        reward_probability = 0.6 - (yes - 3) * 0.2
+        print "Reward",
+        la.reward()
 
-    reward_count = 0
-    for index, la in enumerate(las):
-        if random.random() <= reward_probability:
-            # print('Tsetlin {} rewarded'.format(index + 1))
-            reward_count += 1
-            la.reward()
-        else:
-            # print('Tsetlin {} penalized'.format(index + 1))
-            la.penalize()
-    # print('{}/{} rewarded'.format(reward_count, len(las)))
-    # print('\n')
-print(progression)
-print(action_count)
-count_0 = float(action_count[0])
-count_1 = float(action_count[1])
-final = count_1 / count_0
-print(final)
-#print(progression)
-"""
-Action 1 = Yes
-Action 2 = No
+    print "New State:", la.state
 
-If random() is less than c_n then penalize (true). I.E. c_n is chance of penalty, 1 - c_n is chance of reward
-"""
+print "#Action 1: ", action_count[0], "#Action 2:", action_count[1]
