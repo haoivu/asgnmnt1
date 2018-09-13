@@ -48,7 +48,7 @@ def learning_automaton():
         yes = yay_nay[0]
         yaas.append(yes)
         counts = Counter(yaas)
-        print '#{} - {}'.format(n+1,yay_nay)
+        print('#{} - {}'.format(n+1,yay_nay))
         if yes < 4:
             reward_probability = yes * 0.2
         else:
@@ -61,13 +61,13 @@ def learning_automaton():
                 la.reward()
             else:
                 la.penalize()
-    print '#0:', counts[0]
-    print '#1:', counts[1]
-    print '#2:', counts[2]
-    print '#3:', counts[3]
-    print '#4:', counts[4]
-    print '#5:', counts[5]
-    print '#Yes: {} - #No: {}'.format(action_count[0], action_count[1])
+    print('#0:', counts[0])
+    print('#1:', counts[1])
+    print('#2:', counts[2])
+    print('#3:', counts[3])
+    print('#4:', counts[4])
+    print('#5:', counts[5])
+    print('#Yes: {} - #No: {}'.format(action_count[0], action_count[1]))
     result = float(action_count[1]) / float(action_count[0])
-    print result
+    print(result)
 learning_automaton()
